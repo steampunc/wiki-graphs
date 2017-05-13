@@ -19,6 +19,7 @@ def GetPageData(url):
   link_content = link_content.split('<p>', 1)[1]
   link_content = link_content.split('<\/p>', 1)[0]
   link_content = regex.sub('<sup(.*?)<\/sup>', '', link_content)
+  link_content = regex.sub('<span(.*?)<\/span>', '', link_content)
   link_content = regex.sub('\([^\)]*(?!\))\<a(.+?)a\>(.*?)\)', '', link_content)
   has_link = "<a href=" in link_content
   link_content = link_content.split('<a', 1)[1]
@@ -36,8 +37,6 @@ def GetPageData(url):
 
   return page_data
 
-database_file_writer = open('wiki_connections', 'a')
-writer = csv.DictWriter(database_file_writer, fieldnames=['page_link', 'page_name', 'next_page_link', 'has_link'])
 
 def IsInDB(url):
   with open("wiki_connections", 'r') as database_file_reader:
@@ -48,9 +47,11 @@ def IsInDB(url):
     return False
 
 def AddToDB(page_data):
-  writer.writerow(page_data)
-  if not page_data['has_link']:
-    database_file_writer.write("ERROR: Failed to parse link\n")
+  with open('wiki_connections', 'a') as database_file_writer: 
+    writer = csv.DictWriter(database_file_writer, fieldnames=['page_link', 'page_name', 'next_page_link', 'has_link'])
+    writer.writerow(page_data)
+    if not page_data['has_link']:
+      database_file_writer.write("ERROR: Failed to parse link\n")
 
 def Recurse(page_data):
   if not IsInDB(page_data['next_page_link']):
