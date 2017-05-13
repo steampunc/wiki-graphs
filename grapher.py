@@ -20,8 +20,9 @@ with open("wiki_connections", 'r') as database_file_reader:
     if page_row_data:
       thing.append((row[1], page_row_data[1]))
 
+  plt.figure(1, figsize=(40, 40))
+
   graph=networkx.Graph()
   graph.add_edges_from(thing)
-  networkx.draw_networkx(graph)
-  plt.show()
 
+  write_dot(graph, "test.dot")
